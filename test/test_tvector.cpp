@@ -2,17 +2,17 @@
 
 #include <gtest.h>
 
-TEST(TVector, can_create_vector_with_positive_length) //ÒÂåêòîð ìîæåò ñîçäàòü âåêòîð ñ ïîëîæèòåëüíîé äëèíîé
+TEST(TVector, can_create_vector_with_positive_length) 
 {
-	ASSERT_NO_THROW(TVector<int> v(5)); // íåò èñêëþ÷åíèé
+	ASSERT_NO_THROW(TVector<int> v(5)); 
 }
 
-TEST(TVector, cant_create_too_large_vector) // ÒÂåêòîð íå ìîæåò ñîçäàòü ñëèøêîì áîëüøîé âåêòîð (áîëüøå ìàêñ. ñàéç)
+TEST(TVector, cant_create_too_large_vector) 
 {
 	ASSERT_ANY_THROW(TVector<int> v(MAX_VECTOR_SIZE + 1));
 }
 
-TEST(TVector, throws_when_create_vector_with_negative_length) //âûáðàñûâàåò èñêëþ÷åíèå, êîãäà ñîçäàåòñÿ âåêòîð ñ îòðèöàòåëüíîé äëèíîé
+TEST(TVector, throws_when_create_vector_with_negative_length) 
 {
 	ASSERT_ANY_THROW(TVector<int> v(-5));
 }
@@ -36,7 +36,7 @@ TEST(TVector, copied_vector_is_equal_to_source_one)
 	ASSERT_TRUE(v == v1);
 }
 
-TEST(TVector, copied_vector_has_its_own_memory) // ó ñêîïèðîâàííîãî âåêòîðà ñâîÿ ïàìÿòü
+TEST(TVector, copied_vector_has_its_own_memory) 
 {
 	TVector<int> v(10);
 	TVector<int> v1(v);
@@ -81,8 +81,7 @@ TEST(TVector, throws_when_set_element_with_too_large_index)
 	ASSERT_ANY_THROW(v[100000001] = 4);
 }
 
-TEST(TVector, can_assign_vector_to_itself) //òóò íàâåðíî âñå-òàêè ïîäðàçóìåâàåòñÿ v = v, íî òàê ó ìåíÿ âûçûâàëîñü èñêëþ÷åíèå èç-çà ïàìÿòè,
-//òàê ÷òî ïîêà òàê
+TEST(TVector, can_assign_vector_to_itself) 
 {
 	TVector<int> v(5);
 	for (int i = 0; i < 5; i++) {

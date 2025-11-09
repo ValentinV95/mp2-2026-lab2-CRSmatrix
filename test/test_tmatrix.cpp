@@ -115,6 +115,7 @@ TEST(TMatrix, assign_operator_change_matrix_size)
 	EXPECT_EQ(6, s);
 }
 
+
 TEST(TMatrix, can_assign_matrices_of_different_size)
 {
 	TMatrix<int> m(5);
