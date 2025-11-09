@@ -222,12 +222,12 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>> {
   }
 
   // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicMatrix& v) {
+  friend istream& operator>>(istream& istr, TDynamicMatrix& m) {
     for (size_t i = 0; i < m.sz; i++) istr >> m.pMem[i];
 
     return istr;
   }
-  friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v) {
+  friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& m) {
     for (size_t i = 0; i < m.sz; i++)
       ostr << m.pMem[i] << (i < m.sz - 1 ? '\n' : '\n');
     return ostr;
