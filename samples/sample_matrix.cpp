@@ -8,23 +8,19 @@
 #include "tmatrix.h"
 //---------------------------------------------------------------------------
 
-void main()
-{
-  TDynamicMatrix<int> a(5), b(5), c(5);
-  int i, j;
-
-  setlocale(LC_ALL, "Russian");
-  cout << "Тестирование класс работы с матрицами"
-    << endl;
-  for (i = 0; i < 5; i++)
-    for (j = i; j < 5; j++ )
-    {
-      a[i][j] =  i * 10 + j;
-      b[i][j] = (i * 10 + j) * 100;
+int main() {
+    try {
+        int typeChoice = GetChoice("Choose data type:\n1 - float\n2 - double\n3 - int\nYour choice: ", 1, 3);
+        switch (typeChoice) {
+        case 1: RunCalculator<float>(); break;
+        case 2: RunCalculator<double>(); break;
+        case 3: RunCalculator<int>(); break;
+        }
     }
-  c = a + b;
-  cout << "Matrix a = " << endl << a << endl;
-  cout << "Matrix b = " << endl << b << endl;
-  cout << "Matrix c = a + b" << endl << c << endl;
+    catch (const std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+    }
+
+    return 0;
 }
 //---------------------------------------------------------------------------
