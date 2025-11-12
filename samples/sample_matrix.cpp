@@ -10,21 +10,14 @@
 
 void main()
 {
-  TDynamicMatrix<int> a(5), b(5), c(5);
+  TDynamicMatrix<int> a(5), b(5);
   int i, j;
-
+TDynamicMatrix<int> c(a);
   setlocale(LC_ALL, "Russian");
-  cout << "Тестирование класс работы с матрицами"
-    << endl;
-  for (i = 0; i < 5; i++)
-    for (j = i; j < 5; j++ )
-    {
-      a[i][j] =  i * 10 + j;
-      b[i][j] = (i * 10 + j) * 100;
-    }
-  c = a + b;
-  cout << "Matrix a = " << endl << a << endl;
-  cout << "Matrix b = " << endl << b << endl;
-  cout << "Matrix c = a + b" << endl << c << endl;
+  TDynamicVector<int> m(MAX_VECTOR_SIZE - 1);
+  TDynamicVector<int> m2(MAX_VECTOR_SIZE - 1);
+  
+  m = m2;
+  cout <<( c == a) << endl;
 }
 //---------------------------------------------------------------------------
