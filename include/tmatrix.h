@@ -340,12 +340,17 @@ public:
       {
           throw length_error("the dimensions of the matrixs do not match");
       }
-      for (size_t i = 0; i < sz; i++)
-      {
-          for (size_t j = 0; j < sz; j++)
-          {
-              Tem[i][j] = this[i][j] * m[i][j];
+      for (size_t i = 0; i < sz; ++i) {  
+          TDynamicVector<T> res(sz);       
+
+          for (size_t j = 0; j < sz; ++j) {
+              T sum();
+              for (size_t k = 0; k < sz; ++k) {
+                  sum += (*this)[i][k] * m[k][j];
+              }
+              res[j] = sum;
           }
+          Tem[i] = res;
       }
       return Tem;
   }
