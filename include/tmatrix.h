@@ -94,14 +94,14 @@ size_t TVector<T>::check_vector_size(size_t sz)
 {
   if (sz > MAX_VECTOR_SIZE || sz == 0) throw std::out_of_range("Vector size must be greater than zero and not over" + std::to_string(MAX_VECTOR_SIZE));
 
-  return sz; // Возвращаем, если все гуд
+  return sz;
 }
 
 // Конструктор по умолчанию
 template<typename T>
 TVector<T>::TVector(size_t size) :
 sz(check_vector_size(size)),
-pMem(new T[sz]()) // Размер равен введенному размеру (если в диапазоне); Вектор - массив, инициализированный нулевым значением типа T
+pMem(new T[sz]())
 {
 }
 
@@ -112,19 +112,19 @@ TVector<T>::TVector(T* arr, size_t s) : sz(s)
   // Не знаю, почему тут assert, достаточно throw. Assert аварийно положит программу, если переданный указатель нулевой
   assert(arr != nullptr && "TVector ctor requires non-nullptr arg");
 
-  pMem = new T[sz]; // Создаем массив для нового объекта
-  std::copy(arr, arr + sz, pMem); // Копируем память из массива в поле объекта в диапазоне [arr, arr + sz]
+  pMem = new T[sz];
+  std::copy(arr, arr + sz, pMem);
 }
 
 // Конструктор копирования
 template<typename T>
 TVector<T>::TVector(const TVector& v) : 
 sz(v.sz), 
-pMem(new T[v.sz]) // Список инициализации, объект уже существует => проверки не требуются
+pMem(new T[v.sz])
 {
   for (size_t i = 0; i < sz; ++i)
   {
-    pMem[i] = v.pMem[i]; // Заполняем массив нового объекта
+    pMem[i] = v.pMem[i];
   }
 }
 
@@ -132,9 +132,9 @@ pMem(new T[v.sz]) // Список инициализации, объект уж�
 template<typename T>
 TVector<T>::TVector(TVector&& v) noexcept :
 sz(v.sz),
-pMem(v.pMem) // Происходит подмена указателя. Список инициализации, объект уже существует => проверки не требуются
+pMem(v.pMem)
 { 
-  v.sz = 0; // Обнуляем размер и указатель временного объекта
+  v.sz = 0;
   v.pMem = nullptr;
 }
 
@@ -155,21 +155,21 @@ size_t TVector<T>::size() const noexcept { return sz; }
 template<typename T>
 TVector<T>& TVector<T>::operator=(const TVector& v)
 {
-  if (this == &v) return *this; // Проверка на самоприсваивание
+  if (this == &v) return *this;
 
-  TVector<T> temp(v); // Создаем временный объект = копия переданного вектора
-  swap(*this, temp); // Обмениваем содержимое текущего и временного объектов (иначе на кой делали swap)
-  return *this; // Возвращаем this, наш временный вектор удалится сам
+  TVector<T> temp(v);
+  swap(*this, temp);
+  return *this;
 }
 
 // Оператор перемещения
 template<typename T>
 TVector<T>& TVector<T>::operator=(TVector&& v) noexcept
 {
-  if (this == &v) return *this; // На случай самоперемещения
+  if (this == &v) return *this;
 
-  swap(*this, v); // Обмениваем содержимое объектов
-  return *this; // Возвращаем this, v удалится сам, тк был передан как временный объект
+  swap(*this, v);
+  return *this;
 }
 
 // Индексация без контроля для неконстантных объектов
@@ -190,129 +190,129 @@ const T& TVector<T>::operator[](size_t ind) const
 template<typename T>
 T& TVector<T>::at(size_t ind)
 {
-  if (ind >= sz) throw std::out_of_range("Index out of range"); // Проверка диапазона
+  if (ind >= sz) throw std::out_of_range("Index out of range");
 
-  return pMem[ind]; // Возвращение элемента
+  return pMem[ind];
 }
 
 // Для индексации с контролем у константных объектов
 template<typename T>
 const T& TVector<T>::at(size_t ind) const
 {
-  if (ind >= sz) throw std::out_of_range("Index out of range"); // Проверка диапазона
+  if (ind >= sz) throw std::out_of_range("Index out of range");
 
-  return pMem[ind]; //Возвращение элемента
+  return pMem[ind];
 }
 
 // Оператор сравнения
 template<typename T>
 bool TVector<T>::operator==(const TVector& v) const noexcept
 {
-  if (sz != v.sz) return false; // Сравниваем размеры
+  if (sz != v.sz) return false;
 
   for (size_t i = 0; i < v.sz; ++i)
   {
-    if (pMem[i] != v.pMem[i]) return false; // Сравниваем элементы
+    if (pMem[i] != v.pMem[i]) return false;
   }
 
-  return true; // Если прошло все проверки
+  return true;
 }
 
 // Оператор неравенства
 template<typename T>
 bool TVector<T>::operator!=(const TVector& v) const noexcept
 {
-  return !(*this == v); // Используем уже реализованный оператор ==
+  return !(*this == v);
 }
 
 // Оператор сложения скаляра и вектора
 template<typename T>
 TVector<T> TVector<T>::operator+(T val)
 {
-  TVector<T> result(sz); // Создаем новый объект для результата
+  TVector<T> result(sz); 
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result.pMem[i] = pMem[i] + val; // Вычисляем сумму поэлементно
+    result.pMem[i] = pMem[i] + val;
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Оператор вычитания скаляра из вектора
 template<typename T>
 TVector<T> TVector<T>::operator-(T val)
 {
-  TVector<T> result(sz); // Создаем новый объект для результата
+  TVector<T> result(sz); 
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result.pMem[i] = pMem[i] - val; // Вычисляем разность поэлементно
+    result.pMem[i] = pMem[i] - val;
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Оператор произведения скаляра на вектор
 template<typename T>
 TVector<T> TVector<T>::operator*(T val)
 {
-  TVector<T> result(sz); // Создаем новый объект для результата
+  TVector<T> result(sz); 
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result.pMem[i] = pMem[i] * val; // Вычисляем произведение поэлементно
+    result.pMem[i] = pMem[i] * val;
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Оператор сложения вектора и вектора
 template<typename T>
 TVector<T> TVector<T>::operator+(const TVector& v)
 {
-  if (sz != v.sz) throw std::invalid_argument("Vectors sizes must be equal for addition"); // Проверка на соразмерность
+  if (sz != v.sz) throw std::invalid_argument("Vectors sizes must be equal for addition");
 
-  TVector<T> result(sz); // Создаем новый объект для результата
+  TVector<T> result(sz); 
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result.pMem[i] = pMem[i] + v.pMem[i]; // Вычисляем сумму поэлементно
+    result.pMem[i] = pMem[i] + v.pMem[i];
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Оператор вычитания вектора из вектора
 template<typename T>
 TVector<T> TVector<T>::operator-(const TVector& v)
 {
-  if (sz != v.sz) throw std::invalid_argument("Vectors sizes must be equal for substraction"); // Проверка на соразмерность
+  if (sz != v.sz) throw std::invalid_argument("Vectors sizes must be equal for substraction");
 
-  TVector<T> result(sz); // Создаем новый объект для результата
+  TVector<T> result(sz); 
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result.pMem[i] = pMem[i] - v.pMem[i]; // Вычисляем разность поэлементно
+    result.pMem[i] = pMem[i] - v.pMem[i];
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Оператор произведения вектора на вектор
 template<typename T>
 T TVector<T>::operator*(const TVector& v)
 {
-  if (sz != v.sz) throw std::invalid_argument("Vectors sizes must be equal for scalar multiplication"); // Проверка на соразмерность
+  if (sz != v.sz) throw std::invalid_argument("Vectors sizes must be equal for scalar multiplication");
 
-  T result = T(); // Создаем новую переменную для результата
+  T result = T();
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result += pMem[i] * v.pMem[i]; // Складываем поэлементное произведение
+    result += pMem[i] * v.pMem[i];
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Динамическая матрица - 
@@ -326,6 +326,7 @@ private:
   static size_t check_matrix_size(size_t s); // Метод для проверки размера
 public:
   TMatrix(size_t s = 1); // Конструктор по умолчанию
+  TMatrix(const TMatrix& m);// Конструктор копирования
 
   using TVector<TVector<T>>::operator[]; // Заимствование оператора индексации без контроля
   using TVector<TVector<T>>::size; // Заимствование оператора возвращения размера
@@ -372,7 +373,7 @@ size_t TMatrix<T>::check_matrix_size(size_t s)
 {
   if (s == 0 || s > MAX_MATRIX_SIZE) throw std::out_of_range("Matrix size must be greater than zero and not over" + std::to_string(MAX_MATRIX_SIZE));
 
-  return s; // Возвращаем, если в диапазоне
+  return s;
 }
 
 // Конструктор по умолчанию
@@ -382,36 +383,43 @@ TVector<TVector<T>>(check_matrix_size(s))
 {
   for (size_t i = 0; i < sz; i++)
   {
-    pMem[i] = TVector<T>(sz); // Создаем внутренние вектора
+    pMem[i] = TVector<T>(sz);
   }
+}
+
+// Конструктор копирования
+template<typename T>
+TMatrix<T>::TMatrix(const TMatrix& m) :
+TVector<TVector<T>>(m)
+{
 }
 
 // Оператор сравнения
 template<typename T>
 bool TMatrix<T>::operator==(const TMatrix& m) const noexcept
 {
-  return TVector<TVector<T>>::operator==(m); // Сравниваем вектора векторов, при поэлементном сравнении опять вызывается оператор сравнения векторов
+  return TVector<TVector<T>>::operator==(m);
 }
 
 // Оператор неравенства
 template<typename T>
 bool TMatrix<T>::operator!=(const TMatrix& m) const noexcept
 {
-  return !(*this == m); // Пользуемся уже сущесвующим ==
+  return !(*this == m);
 }
 
 // Произведение матрицы на скаляр
 template<typename T>
 TMatrix<T> TMatrix<T>::operator*(const T& val)
 {
-  TMatrix<T> result(sz); // Создаем новый объект для результата
+  TMatrix<T> result(sz);
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result.pMem[i] = pMem[i] * val; // Умножаем поэлементно
+    result.pMem[i] = pMem[i] * val;
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Произведение матрицы на вектор
@@ -420,14 +428,14 @@ TVector<T> TMatrix<T>::operator*(const TVector<T>& v)
 {
   if (sz != v.size()) throw std::invalid_argument("Matrix and Vector sizes must be equal for multiplication"); // Проверяем соразмерность
 
-  TVector<T> result(sz); // Создаем новый объект  для результата
+  TVector<T> result(sz);
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result[i] = pMem[i] * v; // Поэлементно умножаем строки матрицы на вектор
+    result[i] = pMem[i] * v;
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Сложение матрицы и матрицы
@@ -436,39 +444,38 @@ TMatrix<T> TMatrix<T>::operator+(const TMatrix& m)
 {
   if (sz != m.sz) throw std::invalid_argument("Matrixes sizes must be equal for addition"); // Проверяем соразмерность
 
-  TMatrix<T> result(sz); // Создаем новый объект для результата
+  TMatrix<T> result(sz);
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result.pMem[i] = pMem[i] + m.pMem[i]; // Складываем строки матриц
+    result.pMem[i] = pMem[i] + m.pMem[i];
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Вычитание матрицы из матрицы
 template<typename T>
 TMatrix<T> TMatrix<T>::operator-(const TMatrix& m)
 {
-  if (sz != m.sz) throw std::invalid_argument("Matrixes sizes must be equal for substraction"); // Проверяем соразмерность
+  if (sz != m.sz) throw std::invalid_argument("Matrixes sizes must be equal for substraction");
 
-  TMatrix<T> result(sz); // Создаем новый объект для результата
+  TMatrix<T> result(sz); 
 
   for (size_t i = 0; i < sz; ++i)
   {
-    result.pMem[i] = pMem[i] - m.pMem[i]; // Считаем разность строк матриц
+    result.pMem[i] = pMem[i] - m.pMem[i];
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 // Произведение матрицы на матрицу
 template<typename T>
 TMatrix<T> TMatrix<T>::operator*(const TMatrix& m)
 {
-  if (sz != m.sz) throw std::invalid_argument("Matrixes sizes must be equal for multiplication"); // Проверяем соразмерность
-
-  TMatrix<T> result(sz); // Создаем новый объект для результата
+  if (sz != m.sz) throw std::invalid_argument("Matrixes sizes must be equal for multiplication");
+  TMatrix<T> result(sz); 
 
   for (size_t i = 0; i < sz; ++i)
   {
@@ -481,7 +488,7 @@ TMatrix<T> TMatrix<T>::operator*(const TMatrix& m)
     }
   }
 
-  return result; // Возвращаем результат
+  return result;
 }
 
 #endif
