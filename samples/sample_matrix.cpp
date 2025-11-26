@@ -1,30 +1,44 @@
-﻿// ННГУ, ИИТММ, Курс "Алгоритмы и структуры данных"
-//
-// Copyright (c) Сысоев А.В.
-//
-// Тестирование матриц
-
 #include <iostream>
 #include "tmatrix.h"
-//---------------------------------------------------------------------------
 
-void main()
+int main()
 {
-  TDynamicMatrix<int> a(5), b(5), c(5);
-  int i, j;
+    setlocale(LC_ALL, "");
 
-  setlocale(LC_ALL, "Russian");
-  cout << "Тестирование класс работы с матрицами"
-    << endl;
-  for (i = 0; i < 5; i++)
-    for (j = i; j < 5; j++ )
-    {
-      a[i][j] =  i * 10 + j;
-      b[i][j] = (i * 10 + j) * 100;
+    try {
+        int n;
+        std::cout << "Enter matrix size: ";
+        std::cin >> n;
+
+        TDynamicMatrix<int> A(n), B(n);
+
+        std::cout << "Generating random matrix A..." << std::endl;
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                A[i][j] = i * 10 + j;
+
+        std::cout << "Matrix A:" << std::endl << A << std::endl;
+
+        std::cout << "Generating matrix B (Identity)..." << std::endl;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                B[i][j] = (i == j) ? 1 : 0;
+            }
+        }
+        std::cout << "Matrix B:" << std::endl << B << std::endl;
+
+        TDynamicMatrix<int> C = A * B;
+        std::cout << "Result of A * B:" << std::endl << C << std::endl;
+
+        if (C == A) {
+            std::cout << "Multiplication checked: Correct (A * E = A)." << std::endl;
+        } else {
+            std::cout << "Multiplication checked: Incorrect." << std::endl;
+        }
     }
-  c = a + b;
-  cout << "Matrix a = " << endl << a << endl;
-  cout << "Matrix b = " << endl << b << endl;
-  cout << "Matrix c = a + b" << endl << c << endl;
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return 0;
 }
-//---------------------------------------------------------------------------
