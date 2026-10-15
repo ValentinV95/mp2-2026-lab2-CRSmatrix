@@ -1,173 +1,130 @@
 ﻿// ННГУ, ИИТММ, Курс "Алгоритмы и структуры данных"
 //
-// Copyright (c) Сысоев А.В.
+// Copyright (c) Волокитин В.Д.
 //
 //
 
-#ifndef __TDynamicMatrix_H__
-#define __TDynamicMatrix_H__
+#ifndef __TMatrix_H__
+#define __TMatrix_H__
 
 #include <iostream>
+#include <vector>
+#include <stdexcept>
+#include <cassert>
+#include <algorithm>
+#include <cmath>
 
 using namespace std;
 
 const int MAX_VECTOR_SIZE = 100000000;
 const int MAX_MATRIX_SIZE = 10000;
 
-// Динамический вектор - 
-// шаблонный вектор на динамической памяти
+// Разреженная матрица в формате CRS (Compressed Row Storage)
 template<typename T>
-class TDynamicVector
+class TCRSMatrix
 {
 protected:
-  size_t sz;
-  T* pMem;
+  size_t rows;               // количество строк
+  size_t cols;               // количество столбцов
+  vector<T> values;          // ненулевые элементы (размер NNZ)
+  vector<size_t> col_index;  // столбцовые индексы ненулевых элементов (размер NNZ)
+  vector<size_t> row_ptr;    // индексы начала строк в массивах values и col_index (размер rows + 1)
+
+  static bool isZero(const T& val)
+  {
+    if constexpr (std::is_floating_point_v<T>)
+      return std::abs(val) < 1e-12;
+    else
+      return val == T(0);
+  }
+
 public:
-  TDynamicVector(size_t size = 1) : sz(size)
+  TCRSMatrix(size_t r = 1, size_t c = 0)
   {
-    if (sz == 0)
-      throw out_of_range("Vector size should be greater than zero");
-    pMem = new T[sz]();// {}; // У типа T д.б. констуктор по умолчанию
-  }
-  TDynamicVector(T* arr, size_t s) : sz(s)
-  {
-    assert(arr != nullptr && "TDynamicVector ctor requires non-nullptr arg");
-    pMem = new T[sz];
-    std::copy(arr, arr + sz, pMem);
-  }
-  TDynamicVector(const TDynamicVector& v)
-  {
-  }
-  TDynamicVector(TDynamicVector&& v) noexcept
-  {
-  }
-  ~TDynamicVector()
-  {
-  }
-  TDynamicVector& operator=(const TDynamicVector& v)
-  {
-  }
-  TDynamicVector& operator=(TDynamicVector&& v) noexcept
-  {
+    if (c == 0) c = r; // если передан 1 аргумент, создаем квадратную матрицу r x r
+    if (r == 0 || r > MAX_MATRIX_SIZE || c == 0 || c > MAX_MATRIX_SIZE)
+      throw out_of_range("Matrix dimensions should be between 1 and MAX_MATRIX_SIZE");
+    
+    rows = r;
+    cols = c;
+    row_ptr.assign(rows + 1, 0);
   }
 
-  size_t size() const noexcept { return sz; }
-
-  // индексация
-  T& operator[](size_t ind)
+  // Конструктор конвертации из плотной матрицы
+  TCRSMatrix(const vector<vector<T>>& dense)
   {
-  }
-  const T& operator[](size_t ind) const
-  {
-  }
-  // индексация с контролем
-  T& at(size_t ind)
-  {
-  }
-  const T& at(size_t ind) const
-  {
+    
   }
 
-  // сравнение
-  bool operator==(const TDynamicVector& v) const noexcept
+  // Конструктор напрямую из массивов CRS
+  TCRSMatrix(size_t r, size_t c, const vector<T>& vals, const vector<size_t>& c_idx, const vector<size_t>& r_ptr)
   {
-  }
-  bool operator!=(const TDynamicVector& v) const noexcept
-  {
+  
   }
 
-  // скалярные операции
-  TDynamicVector operator+(T val)
+  TCRSMatrix(const TCRSMatrix& m) = default;
+  TCRSMatrix(TCRSMatrix&& m) noexcept = default;
+  ~TCRSMatrix() = default;
+  TCRSMatrix& operator=(const TCRSMatrix& m) = default;
+  TCRSMatrix& operator=(TCRSMatrix&& m) noexcept = default;
+
+  size_t getRows() const noexcept { return rows; }
+  size_t getCols() const noexcept { return cols; }
+  size_t getNNZ() const noexcept { return values.size(); } // Number of Non-Zeros
+
+  const vector<T>& getValues() const noexcept { return values; }
+  const vector<size_t>& getColIndices() const noexcept { return col_index; }
+  const vector<size_t>& getRowPtr() const noexcept { return row_ptr; }
+
+  // Конвертация обратно в плотную матрицу (для проверки корректности операций)
+  vector<vector<T>> toDense() const
   {
-  }
-  TDynamicVector operator-(double val)
-  {
-  }
-  TDynamicVector operator*(double val)
-  {
+  
   }
 
-  // векторные операции
-  TDynamicVector operator+(const TDynamicVector& v)
+  // Получение элемента по индексам (i, j)
+  T at(size_t i, size_t j) const
   {
+  
+    }
+
+  // Сравнение матриц
+  bool operator==(const TCRSMatrix& m) const noexcept
+  {
+    
   }
-  TDynamicVector operator-(const TDynamicVector& v)
+  bool operator!=(const TCRSMatrix& m) const noexcept
   {
-  }
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
-  {
+    return !(*this == m);
   }
 
-  friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
+  // Транспонирование матрицы (возвращает новую матрицу в формате CRS)
+  TCRSMatrix transpose() const
   {
-    std::swap(lhs.sz, rhs.sz);
-    std::swap(lhs.pMem, rhs.pMem);
+    
   }
 
-  // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicVector& v)
+  // Умножение CRS матрицы на плотный вектор (SpMV)
+  vector<T> operator*(const vector<T>& v) const
   {
-    for (size_t i = 0; i < v.sz; i++)
-      istr >> v.pMem[i]; // требуется оператор>> для типа T
+    
+  }
+
+  // Умножение двух CRS матриц (SpGEMM) -> результат тоже в формате CRS
+  TCRSMatrix operator*(const TCRSMatrix& m) const
+  {
+    
+  }
+
+  // Ввод/вывод (в плотном виде или в виде CRS-структуры)
+  friend istream& operator>>(istream& istr, TCRSMatrix& m)
+  {
     return istr;
   }
-  friend ostream& operator<<(ostream& ostr, const TDynamicVector& v)
+
+friend ostream& operator<<(ostream& ostr, const TCRSMatrix& m)
   {
-    for (size_t i = 0; i < v.sz; i++)
-      ostr << v.pMem[i] << ' '; // требуется оператор<< для типа T
     return ostr;
-  }
-};
-
-
-// Динамическая матрица - 
-// шаблонная матрица на динамической памяти
-template<typename T>
-class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
-{
-  using TDynamicVector<TDynamicVector<T>>::pMem;
-  using TDynamicVector<TDynamicVector<T>>::sz;
-public:
-  TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
-  {
-    for (size_t i = 0; i < sz; i++)
-      pMem[i] = TDynamicVector<T>(sz);
-  }
-
-  using TDynamicVector<TDynamicVector<T>>::operator[];
-
-  // сравнение
-  bool operator==(const TDynamicMatrix& m) const noexcept
-  {
-  }
-
-  // матрично-скалярные операции
-  TDynamicVector<T> operator*(const T& val)
-  {
-  }
-
-  // матрично-векторные операции
-  TDynamicVector<T> operator*(const TDynamicVector<T>& v)
-  {
-  }
-
-  // матрично-матричные операции
-  TDynamicMatrix operator+(const TDynamicMatrix& m)
-  {
-  }
-  TDynamicMatrix operator-(const TDynamicMatrix& m)
-  {
-  }
-  TDynamicMatrix operator*(const TDynamicMatrix& m)
-  {
-  }
-
-  // ввод/вывод
-  friend istream& operator>>(istream& istr, TDynamicMatrix& v)
-  {
-  }
-  friend ostream& operator<<(ostream& ostr, const TDynamicMatrix& v)
-  {
   }
 };
 
