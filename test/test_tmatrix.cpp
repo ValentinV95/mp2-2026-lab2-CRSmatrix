@@ -35,17 +35,42 @@ TEST(TCRSMatrix, can_create_crs_matrix_from_dense_matrix)
 
 TEST(TCRSMatrix, throws_when_create_from_empty_or_inconsistent_dense_matrix)
 {
-  ADD_FAILURE();
+  vector<vector<int>> empty;
+  vector<vector<int>> inconsistent = {
+    {1, 2, 3},
+    {4, 5},
+    {6, 7, 8}
+  };
+  ASSERT_THROW(TCRSMatrix<int> m(empty), out_of_range);
+  ASSERT_THROW(TCRSMatrix<int> m(inconsistent), out_of_range);
 }
 
 TEST(TCRSMatrix, crs_arrays_are_formed_correctly_from_dense)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 0, 0},
+    {3, 4, 0}
+  };
+  TCRSMatrix<int> m(dense);
+  vector<int> expected_values = {1, 2, 3, 4};
+  vector<size_t> expected_col = {0, 2, 0, 1};
+  vector<size_t> expected_row = {0, 2, 2, 4};
+  ASSERT_EQ(expected_values, m.getValues());
+  ASSERT_EQ(expected_col, m.getColIndices());
+  ASSERT_EQ(expected_row, m.getRowPtr());
 }
 
 TEST(TCRSMatrix, can_convert_crs_matrix_back_to_dense)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 0, 0},
+    {3, 4, 0}
+  };
+
+  TCRSMatrix<int> m(dense);
+  ASSERT_EQ(dense, m.toDense());
 }
 
 TEST(TCRSMatrix, can_create_copied_matrix)
@@ -57,32 +82,94 @@ TEST(TCRSMatrix, can_create_copied_matrix)
 
 TEST(TCRSMatrix, copied_matrix_is_equal_to_source_one)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 3, 0}
+  };
+  TCRSMatrix<int> m(dense);
+  TCRSMatrix<int> m1(m);
 }
 
 TEST(TCRSMatrix, copied_matrix_has_its_own_memory)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0},
+    {0, 2}
+  };
+  TCRSMatrix<int> m(dense);
+  TCRSMatrix<int> m1(m);
+
+  vector<int> changed_values = {10, 20};
+  vector<int> changed_col = {0, 1};
+  vector<size_t> changed_row = {0, 1, 2};
+
+  TCRSMatrix<int> changed(2, 2, changed_values, changed_col, changed_row);
+  m1 = changed;
+  ASSERT_NE(m, m1);
+  ASSERT_EQ(dense, m.toDense());
 }
 
 TEST(TCRSMatrix, can_assign_matrix_to_itself)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0},
+    {0, 2}
+  };
+  TCRSMatrix<int> m(dense);
+  m = m;
+  ASSERT_EQ(dense, m.toDense());
 }
 
 TEST(TCRSMatrix, can_assign_matrices_of_equal_size)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense1 = {
+    {1, 0},
+    {0, 2}
+  };
+  vector<vector<int>> dense2 = {
+    {3,4},
+    {5, 6}
+  };
+  TCRSMatrix<int> m1(dense1);
+  TCRSMatrix<int> m2(dense2);
+  m1 = m2;
+  ASSERT_EQ(dense2, m1.toDense());
 }
 
 TEST(TCRSMatrix, assign_operator_change_matrix_size)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense1 = {
+    {1, 2},
+    {3, 4}
+  };
+  vector<vector<int>> dense2 = {
+    {5, 0, 6},
+    {0, 7, 0},
+    {8, 9, 10}
+  };
+  TCRSMatrix<int> m1(dense1);
+  TCRSMatrix<int> m2(dense2);
+  m1 = m2;
+  ASSERT_EQ(3, m1.getRows());
+  ASSERT_EQ(3, m1.getCols());
+  ASSERT_EQ(dense2, m1.toDense());
 }
 
 TEST(TCRSMatrix, can_assign_matrices_of_different_size)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense1 = {
+    {1, 2, 3},
+    {4, 5, 6}
+  };
+  vector<vector<int>> dense2 = {
+    {7, 8},
+    {9, 10},
+    {11, 12}
+  };
+  TCRSMatrix<int> m1(dense1);
+  TCRSMatrix<int> m2(dense2);
+  m1 = m2;
+  ASSERT_EQ(dense2, m1.toDense());
 }
 
 TEST(TCRSMatrix, can_get_rows_cols_and_nnz)
