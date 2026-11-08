@@ -146,17 +146,17 @@ public:
   // Сравнение матриц
   bool operator==(const TCRSMatrix& m) const noexcept
   {
-      if (rows != m.getRows() || cols != m.getCols() || values.size() != m.getNNZ())
+      if (rows != m.rows() || cols != m.cols() || values.size() != m.values.size())
           return false;
 
-      if (row_ptr != m.getRowPtr())
+      if (row_ptr != m.row_ptr())
           return false;
 
-      if (col_index != m.getColIndices())
+      if (col_index != m.col_index())
           return false;
 
       for (size_t i = 0; i < values.size(); i++) {
-          if (!isZero(values[i] - m.getValues()[i]))
+          if (!isZero(values[i] - m.values[i]))
               return false;
       }
 
@@ -223,7 +223,7 @@ public:
   TCRSMatrix operator*(const TCRSMatrix& m) const
   {
       if (cols != m.rows)
-          throw invalid_argument("Matrices cannot be multiplied");
+          throw invalid_argument("Matrices can not be multiplied");
 
       TCRSMatrix trans_m(m.transpose());
       TCRSMatrix res(rows, m.cols);
@@ -269,13 +269,65 @@ public:
   }
 
 // Ввод/вывод (в плотном виде или в виде CRS-структуры)
-friend istream& operator>>(istream& istr, TCRSMatrix& m)
+  friend istream& operator>>(istream& istr, TCRSMatrix& m)
   {
-    return istr;
+      size_t row, col;
+      istr >> row >> col;
+      
+      if (!istr)
+          throw invalid_argument("Failed to read matrix dimensions");
+      
+      if (row == 0 || row > MAX_MATRIX_SIZE || col == 0 || col > MAX_MATRIX_SIZE)
+          throw out_of_range("Matrix dimensions should be between 1 and MAX_MATRIX_SIZE");
+
+      m.rows = row;
+      m.cols = col;
+      m.values.clear();
+      m.col_index.clear();
+      m.row_ptr.assign(row+1, 0);
+
+      for (size_t i = 0; i < m.rows; i++) 
+      {
+          for (size_t j = 0; j < m.cols; j++)
+          {
+              T val;
+              if (!(istr >> val))
+                  throw invalid_argument("Premature end of stream");
+
+
+              if (!m.isZero(val)) 
+              {
+                  m.values.push_back(val);
+                  m.col_index.push_back(j);
+              }
+          }
+
+          m.row_ptr[i + 1] = m.values.size();
+      }
+
+      return istr;
   }
 
-friend ostream& operator<<(ostream& ostr, const TCRSMatrix& m)
+  friend ostream& operator<<(ostream& ostr, const TCRSMatrix& m)
   {
+    for (size_t i = 0; i < m.rows; i++) 
+    {
+        size_t start_ptr = m.row_ptr[i];
+        size_t end_ptr = m.row_ptr[i + 1];
+
+        for (size_t j = 0; j < m.cols; j++) 
+        {
+            if ((start_ptr < end_ptr) && (m.col_index[start_ptr] == j))
+            {
+                ostr << m.values[start_ptr] << " ";
+                start_ptr++;
+            }
+            else { ostr << T(0) << " "; }
+        }
+
+		ostr << endl;
+    }
+
     return ostr;
   }
 };
