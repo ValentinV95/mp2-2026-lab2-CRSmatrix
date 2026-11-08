@@ -180,14 +180,45 @@ public:
   // Транспонирование матрицы (возвращает новую матрицу в формате CRS)
   TCRSMatrix transpose() const
   {
-    vector<vector<T>> res(cols, vector<T> (rows));
-
+    vector<size_t> col_id;
+    vector<size_t> row_id;
+    row_id.push_back(0);
+    vector<T> res;
+    vector<vector<pair<T, size_t>>> prom(this->cols);
+    for (size_t i = 0; i < this->rows; i++){
+      for (size_t j = this->row_ptr[i]; j < this->row_ptr[i+1]; j++){
+        
+        size_t new_row = this->col_index[j];
+        size_t new_col = i;
+        prom[new_row].push_back({this->values[j], new_col});
+      }
+    }
+    for (size_t i = 0; i < this->cols; i++) {
+      for (size_t j = 0; j < prom[i].size(); j++){
+        res.push_back(prom[i][j].first);
+        col_id.push_back(prom[i][j].second);
+      }
+      row_id.push_back(res.size());
+    }
+    return TCRSMatrix(this->cols, this->rows, res, col_id, row_id);
   }
 
   // Умножение CRS матрицы на плотный вектор (SpMV)
   vector<T> operator*(const vector<T>& v) const
   {
-    
+    if (v.size() != cols) {
+      throw invalid_argument("Несовместимые размеры");
+    }
+    vector<T> res(rows, T(0));
+
+    for (size_t i = 0; i < rows; i++) {
+      T sum = T(0);
+      for (size_t j = row_ptr[i]; j < row_ptr[i+1]; j++) {
+        sum += values[j] * v[col_index[j]];
+      }
+      res[i] = sum;
+    }
+    return res
   }
 
   // Умножение двух CRS матриц (SpGEMM) -> результат тоже в формате CRS
@@ -199,16 +230,29 @@ public:
   // Ввод/вывод (в плотном виде или в виде CRS-структуры)
   friend istream& operator>>(istream& istr, TCRSMatrix& m)
   {
-    for (size_t i = 0; i < m.rows; i++){
-      for (size_t j = 0; j < m.cols; j++){
-        
+    size_t r, c;
+    istr >> r >> c;
+    vector<vector<T>> dense(r, vector<T>(c));
+    for (size_t i = 0; i < r; i++) {
+      for (size_t j = 0; j < c; j++) {
+        istr >> dense[i][j];
       }
+    }
+    if (istr) {
+      m = TCRSMatrix(dense);
     }
     return istr;
   }
 
   friend ostream& operator<<(ostream& ostr, const TCRSMatrix& m)
   {
+    T dense = m.toDense();
+    for (size_t i = 0; i < m.rows; i++) {
+      for (size_t j = 0; j < m.cols; j++) {
+        ostr << dense[i][j] << '\t';
+      }
+      ostr << '\n';
+    }
     return ostr;
   }
 };
