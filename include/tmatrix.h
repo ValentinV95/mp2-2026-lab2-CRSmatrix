@@ -13,6 +13,8 @@
 #include <cassert>
 #include <algorithm>
 #include <cmath>
+#include <type_traits>
+#include <utility>
 
 using namespace std;
 
@@ -97,13 +99,11 @@ public:
     if (r_ptr[0] != 0 || r_ptr[r] != vals.size()) {
       throw out_of_range("массив индексов начала/конца строки указан неверно");
     }
-    values = vals;
     for (size_t i = 1; i < r+1; i++){
       if (r_ptr[i] < r_ptr[i-1] || r_ptr[i] > vals.size()) {
         throw out_of_range("массив индексов строки указан неверно");
       }
     }
-    row_ptr = r_ptr;
     if (vals.size() != c_idx.size()) {
       throw out_of_range("Размеры не совпадают");
     }
@@ -113,6 +113,8 @@ public:
       }
     }
     col_index = c_idx;
+    row_ptr = r_ptr;
+    values = vals;
   }
 
   TCRSMatrix(const TCRSMatrix& m) = default;
@@ -149,9 +151,14 @@ public:
   T at(size_t i, size_t j) const
   {
     if (i >= rows || j >= cols) {
-      throw out_of_range("обращение к несуществующему эл-ту")
+      throw out_of_range("обращение к несуществующему эл-ту");
     }
-    return toDense()[i][j];
+    for (size_t k = row_ptr[i]; k < row_ptr[i+1]; k++){
+      if (col_index[k] == j) {
+        return values[k];
+      }
+    }
+    return T(0);
   }
 
   // Сравнение матриц
@@ -218,20 +225,48 @@ public:
       }
       res[i] = sum;
     }
-    return res
+    return res;
   }
 
   // Умножение двух CRS матриц (SpGEMM) -> результат тоже в формате CRS
   TCRSMatrix operator*(const TCRSMatrix& m) const
   {
-    
+
+    if (cols != m.rows){
+      throw invalid_argument("матрицы неправильных размеров");
+    }
+
+    vector<T> res;
+    vector<size_t> col_i;
+    vector<size_t> row_i = {0};
+    for (size_t i = 0; i < rows; i++) {
+      vector<T> sum(m.cols, T(0));
+      for (size_t j = row_ptr[i]; j < row_ptr[i+1]; j++) {
+        size_t k = col_index[j];
+        for (size_t t = m.row_ptr[k]; t < m.row_ptr[k+1]; t++){
+          size_t col = m.col_index[t];
+          sum[col] += values[j] * m.values[t];
+        }
+      }
+      for (size_t j = 0; j < m.cols; j++) {
+        if (!isZero(sum[j])) {
+          res.push_back(sum[j]);
+          col_i.push_back(j);
+        }
+      }
+      row_i.push_back(res.size());
+    }
+    return TCRSMatrix(rows, m.cols, res, col_i, row_i);
   }
 
   // Ввод/вывод (в плотном виде или в виде CRS-структуры)
   friend istream& operator>>(istream& istr, TCRSMatrix& m)
   {
     size_t r, c;
-    istr >> r >> c;
+    if (!(istr >> r >> c)) return istr;
+    if (r == 0 || r > MAX_MATRIX_SIZE || c == 0 || c > MAX_MATRIX_SIZE) {
+      return istr;
+    }
     vector<vector<T>> dense(r, vector<T>(c));
     for (size_t i = 0; i < r; i++) {
       for (size_t j = 0; j < c; j++) {
@@ -246,7 +281,7 @@ public:
 
   friend ostream& operator<<(ostream& ostr, const TCRSMatrix& m)
   {
-    T dense = m.toDense();
+    vector<vector<T>> dense = m.toDense();
     for (size_t i = 0; i < m.rows; i++) {
       for (size_t j = 0; j < m.cols; j++) {
         ostr << dense[i][j] << '\t';
