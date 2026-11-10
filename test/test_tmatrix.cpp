@@ -88,6 +88,7 @@ TEST(TCRSMatrix, copied_matrix_is_equal_to_source_one)
   };
   TCRSMatrix<int> m(dense);
   TCRSMatrix<int> m1(m);
+  ASSERT_EQ(m, m1);
 }
 
 TEST(TCRSMatrix, copied_matrix_has_its_own_memory)
@@ -100,7 +101,7 @@ TEST(TCRSMatrix, copied_matrix_has_its_own_memory)
   TCRSMatrix<int> m1(m);
 
   vector<int> changed_values = {10, 20};
-  vector<int> changed_col = {0, 1};
+  vector<size_t> changed_col = {0, 1};
   vector<size_t> changed_row = {0, 1, 2};
 
   TCRSMatrix<int> changed(2, 2, changed_values, changed_col, changed_row);
@@ -174,96 +175,240 @@ TEST(TCRSMatrix, can_assign_matrices_of_different_size)
 
 TEST(TCRSMatrix, can_get_rows_cols_and_nnz)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 0, 0},
+    {3, 4, 0}
+  };
+  TCRSMatrix<int> m(dense);
+  ASSERT_EQ(3, m.getRows());
+  ASSERT_EQ(3, m.getCols());
+  ASSERT_EQ(4, m.getNNZ());
 }
 
 TEST(TCRSMatrix, can_get_nonzero_and_zero_elements_by_at)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 0, 0},
+    {3, 4, 0}
+  };
+  TCRSMatrix<int> m(dense);
+  ASSERT_EQ(1, m.at(0, 0));
+  ASSERT_EQ(0, m.at(0, 1));
+  ASSERT_EQ(2, m.at(0, 2));
+  ASSERT_EQ(0, m.at(1, 1));
+  ASSERT_EQ(4, m.at(2, 1));
 }
 
 TEST(TCRSMatrix, throws_when_get_element_with_negative_or_too_large_index)
 {
-  ADD_FAILURE();
+  TCRSMatrix<int> m(3, 3);
+  ASSERT_THROW(m.at(3, 0), out_of_range);
+  ASSERT_THROW(m.at(0, 3), out_of_range);
 }
 
 TEST(TCRSMatrix, compare_equal_matrices_return_true)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 3, 0}
+  };
+  TCRSMatrix<int> m1(dense);
+  TCRSMatrix<int> m2(dense);
+  ASSERT_TRUE(m1 == m2);
 }
 
 TEST(TCRSMatrix, compare_matrix_with_itself_return_true)
 {
-  ADD_FAILURE();
+  TCRSMatrix<int> m(3, 3);
+  ASSERT_TRUE(m == m);
 }
 
 TEST(TCRSMatrix, matrices_with_different_size_are_not_equal)
 {
-  ADD_FAILURE();
+  TCRSMatrix<int> m1(2, 3);
+  TCRSMatrix<int> m2(3, 2);
+  ASSERT_FALSE(m1 == m2);
 }
 
 TEST(TCRSMatrix, matrices_with_same_size_but_different_elements_are_not_equal)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense1 = {
+    {1, 0},
+    {0, 2}
+  };
+  vector<vector<int>> dense2 = {
+    {1, 0},
+    {0, 3}
+  };
+  TCRSMatrix<int> m1(dense1);
+  TCRSMatrix<int> m2(dense2);
+  ASSERT_FALSE(m1 == m2);
+  ASSERT_TRUE(m1 != m2);
 }
 
 TEST(TCRSMatrix, can_transpose_square_matrix)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 3, 0},
+    {4, 0, 5}
+  };
+  vector<vector<int>> expected = {
+    {1, 0, 4},
+    {0, 3, 0},
+    {2, 0, 5}
+  };
+  TCRSMatrix<int> m(dense);
+  ASSERT_EQ(expected, m.transpose().toDense());
 }
 
 TEST(TCRSMatrix, can_transpose_rectangular_matrix)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 3, 0}
+  };
+  vector<vector<int>> expected = {
+    {1, 0},
+    {0, 3},
+    {2, 0}
+  };
+  TCRSMatrix<int> m(dense);
+  ASSERT_EQ(expected, m.transpose().toDense());
 }
 
 TEST(TCRSMatrix, double_transpose_returns_original_matrix)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 3, 0}
+  };
+  TCRSMatrix<int> m(dense);
+  ASSERT_EQ(m, m.transpose().transpose());
 }
 
 TEST(TCRSMatrix, can_multiply_matrix_by_vector_of_compatible_size)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 3, 0},
+    {4, 0, 5}
+  };
+  vector<int> v = {2, 3, 4};
+  vector<int> expected = {10, 9, 28};
+  TCRSMatrix<int> m(dense);
+  ASSERT_EQ(expected, m * v);
 }
 
 TEST(TCRSMatrix, cant_multiply_matrix_by_vector_of_incompatible_size)
 {
-  ADD_FAILURE();
+  TCRSMatrix<int> m(2, 3);
+  vector<int> v = {1, 2};
+  ASSERT_THROW(m * v, invalid_argument);
 }
 
 TEST(TCRSMatrix, multiply_zero_matrix_by_vector_returns_zero_vector)
 {
-  ADD_FAILURE();
+  TCRSMatrix<int> m(3, 2);
+  vector<int> v = {5, 10};
+  vector<int> expected = {0, 0, 0};
+  ASSERT_EQ(expected, m * v);
 }
 
 TEST(TCRSMatrix, can_multiply_square_crs_matrices_of_equal_size)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense1 = {
+    {1, 0, 2},
+    {0, 3, 0},
+    {4, 0, 5}
+  };
+  vector<vector<int>> dense2 = {
+    {1, 2, 0},
+    {0, 3, 0},
+    {4, 0, 5}
+  };
+  vector<vector<int>> expected = {
+    {9, 2, 10},
+    {0, 9, 0},
+    {24, 8, 25}
+  };
+  TCRSMatrix<int> m1(dense1);
+  TCRSMatrix<int> m2(dense2);
+  ASSERT_EQ(expected, (m1 * m2).toDense());
 }
 
 TEST(TCRSMatrix, can_multiply_rectangular_crs_matrices_of_compatible_size)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense1 = {
+    {1, 0, 2},
+    {0, 3, 0}
+  };
+  vector<vector<int>> dense2 = {
+    {1, 0},
+    {0, 2},
+    {3, 0}
+  };
+  vector<vector<int>> expected = {
+    {7, 0},
+    {0, 6}
+  };
+  TCRSMatrix<int> m1(dense1);
+  TCRSMatrix<int> m2(dense2);
+  ASSERT_EQ(expected, (m1 * m2).toDense());
 }
 
 TEST(TCRSMatrix, cant_multiply_crs_matrices_with_incompatible_sizes)
 {
-  ADD_FAILURE();
+  TCRSMatrix<int> m1(2, 3);
+  TCRSMatrix<int> m2(2, 2);
+
+  ASSERT_THROW(m1 * m2, invalid_argument);
 }
 
 TEST(TCRSMatrix, multiply_by_identity_matrix_returns_original_matrix)
 {
-  ADD_FAILURE();
+  vector<vector<int>> dense = {
+    {1, 0, 2},
+    {0, 3, 0}
+  };
+
+  vector<vector<int>> identity = {
+    {1, 0, 0},
+    {0, 1, 0},
+    {0, 0, 1}
+  };
+
+  TCRSMatrix<int> m(dense);
+  TCRSMatrix<int> e(identity);
+
+  ASSERT_EQ(dense, (m * e).toDense());
 }
 
 TEST(TCRSMatrix, multiply_matrix_with_empty_rows_works_correctly)
 {
-  ADD_FAILURE();
-}
+  vector<vector<int>> dense1 = {
+    {0, 0, 0},
+    {1, 0, 2},
+    {0, 0, 0}
+  };
 
-TEST(TDynamicMatrix, cant_subtract_matrixes_with_not_equal_size)
-{
-  ADD_FAILURE();
+  vector<vector<int>> dense2 = {
+    {1, 0},
+    {0, 2},
+    {3, 0}
+  };
+
+  vector<vector<int>> expected = {
+    {0, 0},
+    {7, 0},
+    {0, 0}
+  };
+
+  TCRSMatrix<int> m1(dense1);
+  TCRSMatrix<int> m2(dense2);
+
+  ASSERT_EQ(expected, (m1 * m2).toDense());
 }
 
