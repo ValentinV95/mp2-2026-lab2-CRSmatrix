@@ -64,7 +64,7 @@ public:
       if (rows == 0 || rows > MAX_MATRIX_SIZE || cols == 0 || cols > MAX_MATRIX_SIZE) {
           throw out_of_range("");
       }
-      row_ptr.assign(rows + 1);
+      row_ptr.assign(rows + 1, 0);
       for (size_t i = 0; i < rows; i++) {
           for (size_t j = 0; j < cols; j++) {
               if (!isZero(dense[i][j])) {
