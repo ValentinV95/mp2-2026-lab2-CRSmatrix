@@ -851,7 +851,7 @@ TEST(TCRSMatrix, multiply_by_identity_matrix_returns_original_matrix)
 
 TEST(TCRSMatrix, multiply_matrix_with_empty_rows_works_correctly)
 {
-    //пустая строка 0 и 2
+    //пустая строка 1 и 3
     vector<vector<int>> dense1 = {
     {0, 0, 0, 0},
     {2, 0, 3, 0},

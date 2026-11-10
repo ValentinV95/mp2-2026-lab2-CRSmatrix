@@ -109,7 +109,6 @@
   <ItemGroup>
     <ClCompile Include="..\test\test_main.cpp" />
     <ClCompile Include="..\test\test_tmatrix.cpp" />
-    <ClCompile Include="..\test\test_tvector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
