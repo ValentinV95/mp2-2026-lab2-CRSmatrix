@@ -198,7 +198,34 @@ public:
   // Транспонирование матрицы (возвращает новую матрицу в формате CRS)
   TCRSMatrix transpose() const
   {
-    
+      TCRSMatrix result(cols, rows);
+
+      if (values.empty()) {
+          return result;
+      }
+
+      vector<size_t> counts(cols, 0);
+      for (size_t t = 0; t < values.size(); t++) {
+          counts[col_index[t]]++;
+      }
+
+      for (size_t t = 0; t < cols; t++) {
+          result.row_ptr[t + 1] = result.row_ptr[t] + counts[t];
+      }
+
+      result.values.assign(values.size(), T(0));
+      result.col_index.assign(values.size(), 0);
+
+	  vector<size_t> cursor = result.row_ptr;
+      for (size_t i = 0; i < rows; i++) {
+          for (size_t t = row_ptr[i]; t < row_ptr[i + 1]; t++) {
+              size_t j = col_index[t];
+              size_t pos = cursor[j]++;
+              result.values[pos] = values[t];
+              result.col_index[pos] = i;
+          }
+      }
+	  return result;
   }
 
   // Умножение CRS матрицы на плотный вектор (SpMV)
@@ -242,6 +269,15 @@ public:
                   row_used[col_b] = true;
               }
           }
+
+          for(size_t t = 0; t < m.cols; t++) {
+              if (row_used[t]) {
+                  new_values.push_back(row_vals[t]);
+                  new_col_index.push_back(t);
+              }
+		  }
+
+		  new_row_ptr[i + 1] = new_values.size();
       }
 
       return TCRSMatrix(rows, m.cols, new_values, new_col_index, new_row_ptr);
@@ -250,11 +286,34 @@ public:
   // Ввод/вывод (в плотном виде или в виде CRS-структуры)
   friend istream& operator>>(istream& istr, TCRSMatrix& m)
   {
-    return istr;
+      size_t r = 0, c = 0;
+      if (!(istr >> r >> c)) {
+          return istr;
+      }
+
+      vector<vector<T>> dense(r, vector<T>(c));
+      for (size_t i = 0; i < r; i++) {
+          for (size_t j = 0; j < c; j++) {
+              istr >> dense[i][j];
+          }
+      }
+
+	  m = TCRSMatrix(dense);
+      return istr;
   }
 
 friend ostream& operator<<(ostream& ostr, const TCRSMatrix& m)
   {
+    auto dense = m.toDense();
+    for (size_t i = 0; i < m.getRows(); i++) {
+        for (size_t j = 0; j < m.getCols(); j++) {
+            ostr << dense[i][j];
+            if (j + 1 < m.getCols()) {
+                ostr << " ";
+            }
+        }
+        ostr << "\n";
+    }
     return ostr;
   }
 };
