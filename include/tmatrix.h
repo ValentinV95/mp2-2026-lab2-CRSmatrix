@@ -146,13 +146,13 @@ public:
   // Сравнение матриц
   bool operator==(const TCRSMatrix& m) const noexcept
   {
-      if (rows != m.rows() || cols != m.cols() || values.size() != m.values.size())
+      if (rows != m.rows || cols != m.cols || values.size() != m.values.size())
           return false;
 
-      if (row_ptr != m.row_ptr())
+      if (row_ptr != m.row_ptr)
           return false;
 
-      if (col_index != m.col_index())
+      if (col_index != m.col_index)
           return false;
 
       for (size_t i = 0; i < values.size(); i++) {
