@@ -1,0 +1,10 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/\u0421\u043e\u043d\u044f/mp2-2026-lab2-CRSmatrix/out/build/x64-Debug/cmake_install.cmake",
+		"C:/Users/\u0421\u043e\u043d\u044f/mp2-2026-lab2-CRSmatrix/out/build/x64-Debug/samples/cmake_install.cmake",
+		"C:/Users/\u0421\u043e\u043d\u044f/mp2-2026-lab2-CRSmatrix/out/build/x64-Debug/test/cmake_install.cmake",
+		"C:/Users/\u0421\u043e\u043d\u044f/mp2-2026-lab2-CRSmatrix/out/build/x64-Debug/gtest/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
