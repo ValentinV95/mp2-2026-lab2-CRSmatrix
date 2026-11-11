@@ -251,6 +251,10 @@ public:
   // Умножение двух CRS матриц (SpGEMM) -> результат тоже в формате CRS
   TCRSMatrix operator*(const TCRSMatrix& m) const
   {
+      if (cols != m.rows) {
+		  throw invalid_argument("matrix dimensions are not compatible for multiplication");
+      }
+
       vector<T> new_values;
       vector<size_t> new_col_index;
       vector<size_t> new_row_ptr(rows + 1, 0);
