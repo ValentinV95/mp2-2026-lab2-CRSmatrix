@@ -127,7 +127,7 @@ public:
 
     for (size_t i = 0; i < rows;i++){
 
-      size_t fl = row_ptr[i + 1] - row_ptr[i]; //счетчик
+      size_t fl = row_ptr[i + 1] - row_ptr[i]; 
       for (size_t j = 0; j < fl;j++){
 
         size_t k = row_ptr[i] + j;
@@ -144,7 +144,7 @@ public:
         throw out_of_range("The index is out of the matrix bounds");
       }
     
-    size_t fl = row_ptr[i + 1] - row_ptr[i]; //счетчик
+    size_t fl = row_ptr[i + 1] - row_ptr[i]; 
 
     for (size_t pos = 0; pos < fl; pos++) {
         size_t idx = row_ptr[i] + pos;
@@ -186,7 +186,7 @@ public:
   {
     TCRSMatrix res(cols, rows);
 
-    vector<size_t> fl(cols + 1, 0); //счетчик
+    vector<size_t> fl(cols + 1, 0); 
 
     for (size_t a_col = 0; a_col < values.size();a_col++){
       fl[col_index[a_col] + 1]++;
@@ -243,7 +243,7 @@ public:
     if (cols != m.rows) {
       throw invalid_argument("Different matrix sizes");
     }
-    vector<T> AB_values; //умножение A*B 
+    vector<T> AB_values; 
     vector<size_t> AB_cols;
     vector<size_t> AB_row_ptr;
     AB_row_ptr.push_back(0);
