@@ -1,0 +1,16 @@
+# ninja log v6
+4	813	8160500291505277	samples/CMakeFiles/matrix.dir/sample_matrix.cpp.obj	999e776fbb685f9d
+815	1237	8160500299614585	samples/matrix.exe	c911cb7b13317640
+6	1161	8161036909689564	samples/CMakeFiles/matrix.dir/sample_matrix.cpp.obj	999e776fbb685f9d
+1162	1799	8161036921253731	samples/matrix.exe	c911cb7b13317640
+18	473	8161040535537744	samples/CMakeFiles/matrix.dir/sample_matrix.cpp.obj	999e776fbb685f9d
+474	648	8161040540088754	samples/matrix.exe	c911cb7b13317640
+16	467	8161042019900622	samples/CMakeFiles/matrix.dir/sample_matrix.cpp.obj	999e776fbb685f9d
+468	637	8161042024421625	samples/matrix.exe	c911cb7b13317640
+23	620	8161043400256870	test/CMakeFiles/test_matrix.dir/test_main.cpp.obj	f54751dbe7884b99
+28	717	8161043400306894	test/CMakeFiles/test_matrix.dir/test_tmatrix.cpp.obj	3b78965e2a3859e4
+15	1324	8161043400166856	gtest/CMakeFiles/gtest.dir/gtest-all.cc.obj	65d017397ef55061
+1325	1418	8161043413276048	gtest/gtest.lib	385d02cd07977f4b
+1418	1908	8161043414213387	test/test_matrix.exe	9e7ed774ffd0483
+16	1230	8161123339808380	test/CMakeFiles/test_matrix.dir/test_tmatrix.cpp.obj	3b78965e2a3859e4
+1232	1494	8161123351965624	test/test_matrix.exe	9e7ed774ffd0483
