@@ -32,53 +32,138 @@ void printCRSInternals(const TCRSMatrix<T>& m, const string& name)
 
 int main()
 {
-  const size_t N = 5;
-  vector<vector<int>> dense_a(N, vector<int>(N, 0));
-  vector<vector<int>> dense_b(N, vector<int>(N, 0));
-  vector<int> v(N, 1);
-
   setlocale(LC_ALL, "Russian");
-  cout << "Тестирование класса работы с разреженными матрицами (CRS)" << endl << endl;
 
-  // Заполняем исходные плотные матрицы
-  for (size_t i = 0; i < N; i++)
-  {
-    dense_b[i][i] = (i + 1) * 10; // Матрица B — диагональная
-    for (size_t j = i; j < N; j++)
-    {
-      dense_a[i][j] = i * 10 + j + 1; // Матрица A — верхнетреугольная
-    }
+  int rows, cols;
+
+  cout << "Введите количество строк и столбцов матрицы A: ";
+  cin >> rows >> cols;
+
+  if (!cin || rows <= 0 || cols <= 0 || rows > MAX_MATRIX_SIZE || cols > MAX_MATRIX_SIZE) {
+    cout << "Некорректные размеры\n";
+    return 1;
   }
 
-  // Конвертируем в формат CRS
-  TCRSMatrix<int> a(dense_a);
-  TCRSMatrix<int> b(dense_b);
+  TCRSMatrix<int> a(rows, cols);
 
-  cout << "Matrix a = " << endl << a << endl;
-  printCRSInternals(a, "a");
+  cout << "Введите элементы матрицы A:\n";
+  cin >> a;
 
-  cout << "Matrix b = " << endl << b << endl;
+  if (!cin) {
+    cout << "Некорректный ввод\n";
+    return 1;
+  }
 
-  // 1. Тестирование транспонирования
-  TCRSMatrix<int> a_t = a.transpose();
-  cout << "Matrix a^T (транспонированная a) = " << endl << a_t << endl;
-  printCRSInternals(a_t, "a^T");
+  int choice;
 
-  // 2. Тестирование умножения матрицы на вектор (SpMV)
-  vector<int> res_vec = a * v;
-  cout << "Vector v = [ ";
-  for (int x : v) cout << x << " ";
-  cout << "]" << endl;
+  while (true) {
+    cout << "\n";
+    cout << "1. Транспонировать матрицу\n";
+    cout << "2. Умножить матрицу на вектор\n";
+    cout << "3. Умножить матрицу на матрицу\n";
+    cout << "4. Показать матрицу и CRS-массивы\n";
+    cout << "5. Выход\n";
+    cout << "Выберите действие: ";
 
-  cout << "Result a * v = [ ";
-  for (int x : res_vec) cout << x << " ";
-  cout << "]" << endl << endl;
+    cin >> choice;
 
-  // 3. Тестирование умножения матриц (SpGEMM)
-  TCRSMatrix<int> c = a * b;
-  cout << "Matrix c = a * b" << endl << c << endl;
-  printCRSInternals(c, "c");
+    if (!cin) {
+      cout << "Ошибка ввода\n";
+      return 1;
+    }
 
-  return 0;
+    switch (choice) {
+      case 1: {
+        TCRSMatrix<int> transposed = a.transpose();
+
+        cout << "Транспонированная матрица A:\n";
+        cout << transposed << "\n";
+
+        printCRSInternals(transposed, "A^T");
+
+        break;
+      }
+
+      case 2: {
+        vector<int> v(cols);
+
+        cout << "Введите элементы вектора (" << cols << " штук)\n";
+
+        for (int i = 0; i < cols; i++) {
+          cin >> v[i];
+
+          if (!cin) {
+            cout << "Некорректный ввод\n";
+            return 1;
+          }
+        }
+
+        vector<int> result = a * v;
+
+        cout << "Результат:\n";
+
+        for (int i = 0; i < result.size(); i++) {
+          cout << result[i] << " ";
+        }
+
+        cout << "\n";
+
+        break;
+      }
+
+      case 3: {
+        int rowsB, colsB;
+
+        cout << "Введите количество строк и столбцов матрицы B: ";
+        cin >> rowsB >> colsB;
+
+        if (!cin || rowsB <= 0 || colsB <= 0 || rowsB > MAX_MATRIX_SIZE || colsB > MAX_MATRIX_SIZE) {
+          cout << "Некорректные размеры\n";
+          return 1;
+        }
+
+        if (cols != rowsB) {
+          cout << "Некорректные размеры\n";
+          break;
+        }
+
+        TCRSMatrix<int> b(rowsB, colsB);
+
+        cout << "Введите элементы матрицы B:\n";
+        cin >> b;
+
+        if (!cin) {
+          cout << "Некорректный ввод\n";
+          return 1;
+        }
+
+        TCRSMatrix<int> result = a * b;
+
+        cout << "Результат:\n";
+        cout << result << "\n";
+
+        printCRSInternals(result, "A * B");
+
+        break;
+      }
+
+      case 4: {
+        cout << "Матрица A:\n";
+        cout << a << "\n";
+
+        printCRSInternals(a, "A");
+
+        break;
+      }
+
+      case 5: {
+        return 0;
+      }
+
+      default: {
+        cout << "Некорректный ввод\n";
+        break;
+      }
+    }
+  }
 }
-//---------------------------------------------------------------------------
