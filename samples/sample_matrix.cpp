@@ -54,16 +54,47 @@ int main()
   TCRSMatrix<int> a(dense_a);
   TCRSMatrix<int> b(dense_b);
 
-  cout << "Matrix a = " << endl << a << endl;
-  printCRSInternals(a, "a");
+  int choice = -1;
+  while(choice != 0){
+    cout << "Выберите действие:\n";
+    cout << "1 - Ввести матрицу A с клавиатуры\n";
+    cout << "2 - Ввести матрицу B с клавиатуры\n";
+    cout << "3 - Вывести матрицы A и B\n";
+    cout << "4 - Транспонировать матрицу A\n";
+    cout << "5 - Умножить матрицу A на вектор (SpMV)\n";
+    cout << "6 - Умножить матрицу A на матрицу B (SpGEMM)\n";
+    cout << "0 - Выход\n";
+    cout << "Ваш выбор: ";
+    cin >> choice;
+    cout << endl;
+  try{
+      if(choice == 1){
+        cout << "Введите размеры (строки и столбцы) и элементы матрицы A:\n";
+        cin >> a;
+      }
+      else if(choice == 2){
+        cout << "Введите размеры (строки и столбцы) и элементы матрицы B:\n";
+        cin >> b;
+      }
+      else if(choice == 3){
+    cout << "Matrix a = " << endl << a << endl;
+    printCRSInternals(a, "a");
 
-  cout << "Matrix b = " << endl << b << endl;
-
+    cout << "Matrix b = " << endl << b << endl;
+    printCRSInternals(b, "b");
+      }
   // 1. Тестирование транспонирования
+  else if(choice == 4){
   TCRSMatrix<int> a_t = a.transpose();
   cout << "Matrix a^T (транспонированная a) = " << endl << a_t << endl;
   printCRSInternals(a_t, "a^T");
-
+  }
+  else if(choice == 5){
+        size_t n = a.getCols();
+        vector<int> v(n);
+        cout << "Введите элементы вектора размера " << n << ":\n";
+        for(size_t i = 0;i < n;i++)
+          cin >> v[i];
   // 2. Тестирование умножения матрицы на вектор (SpMV)
   vector<int> res_vec = a * v;
   cout << "Vector v = [ ";
@@ -73,12 +104,18 @@ int main()
   cout << "Result a * v = [ ";
   for (int x : res_vec) cout << x << " ";
   cout << "]" << endl << endl;
-
+  }
+  else if(choice == 6){
   // 3. Тестирование умножения матриц (SpGEMM)
   TCRSMatrix<int> c = a * b;
   cout << "Matrix c = a * b" << endl << c << endl;
   printCRSInternals(c, "c");
-
-  return 0;
+    }
+  }
+  catch(const exception& e){
+      cout << "Ошибка: " << e.what() << endl << endl;
+  }
 }
+  return 0;
+  }
 //---------------------------------------------------------------------------

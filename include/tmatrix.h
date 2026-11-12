@@ -254,11 +254,12 @@ public:
 
 friend ostream& operator<<(ostream& ostr, const TCRSMatrix& m)
   {
+    vector<vector<T>> dense = m.toDense();
     for(size_t i = 0;i < m.rows;i++){
       for(size_t j = 0;j < m.cols;j++){
         if(j > 0)
           ostr << ' ';
-        ostr << m.at(i,j);
+        ostr << dense[i][j];
       }
       ostr << '\n';
     }
