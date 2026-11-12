@@ -82,6 +82,13 @@ public:
   {
       if (r == 0 || c == 0 || r_ptr.size() != r + 1)
           throw invalid_argument("error");
+      if (r > MAX_MATRIX_SIZE || c > MAX_MATRIX_SIZE || vals.size() != c_idx.size())
+          throw invalid_argument("error");
+      for (int i = 0; i < c_idx.size(); i++) {
+          if (c_idx[i] >= c)
+              throw out_of_range("error");
+      }
+
       rows = r;
       cols = c;
       values = vals;
@@ -134,14 +141,7 @@ public:
   // Сравнение матриц
   bool operator==(const TCRSMatrix& m) const noexcept
   {
-      if (rows != m.rows || cols != m.cols || row_ptr != m.row_ptr || col_index != m.col_index)
-          return false;
-      
-      for (int i = 0; i < values.size(); i++) {
-          if (values[i] != m.values[i])
-              return false;
-      }
-      return true;
+      return (rows == m.rows && cols == m.cols && row_ptr == m.row_ptr && col_index == m.col_index && values == m.values);
   }
   bool operator!=(const TCRSMatrix& m) const noexcept
   {
@@ -230,7 +230,8 @@ public:
       vector<vector<T>> matrix(m.rows, vector<T>(m.cols));
       for (int i = 0; i < m.rows; i++) {
           for (int j = 0; j < m.cols; j++) {
-              istr >> matrix[i][j];
+              if(!(istr >> matrix[i][j]))
+                  return istr;
           }
       }
       m = TCRSMatrix(matrix);
