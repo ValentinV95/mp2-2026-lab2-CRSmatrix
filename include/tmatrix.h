@@ -202,7 +202,7 @@ public:
   {
     if (cols != v.size())
       throw invalid_argument("Wrong vector size");
-    vector<T> result(rows, 0);
+    vector<T> result(rows, T(0));
     for (int i = 0; i < rows; i++) {
       for (int j = row_ptr[i]; j < row_ptr[i + 1]; j++) {
         result[i] += (values[j] * v[col_index[j]]);
