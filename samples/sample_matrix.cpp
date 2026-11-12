@@ -30,55 +30,114 @@ void printCRSInternals(const TCRSMatrix<T>& m, const string& name)
   cout << "]" << endl << endl;
 }
 
+TCRSMatrix<int> inputM() {
+    size_t r, c;
+    cout << "Введите количество строк и столбцов: ";
+    cin >> r >> c;
+    vector<vector<int>> dense(r, vector<int>(c, 0));
+    cout << "Введите элементы матрицы: " << endl;
+    for (size_t i = 0; i < r; i++) {
+        for (size_t j = 0; j < c; j++) {
+            cin >> dense[i][j];
+        }
+    }
+    return TCRSMatrix<int>(dense);
+}
+
 int main()
 {
-  const size_t N = 5;
-  vector<vector<int>> dense_a(N, vector<int>(N, 0));
-  vector<vector<int>> dense_b(N, vector<int>(N, 0));
-  vector<int> v(N, 1);
-
   setlocale(LC_ALL, "Russian");
-  cout << "Тестирование класса работы с разреженными матрицами (CRS)" << endl << endl;
+  TCRSMatrix<int> matrixA;
+  TCRSMatrix<int> matrixB;
 
-  // Заполняем исходные плотные матрицы
-  for (size_t i = 0; i < N; i++)
-  {
-    dense_b[i][i] = (i + 1) * 10; // Матрица B — диагональная
-    for (size_t j = i; j < N; j++)
-    {
-      dense_a[i][j] = i * 10 + j + 1; // Матрица A — верхнетреугольная
+  int choice = 0;
+
+  while (true) {
+
+    cout << "1. Ввести текущую матрицу" << endl;
+    cout << "2. Показать текущую матрицу" << endl;
+    cout << "3. Показать CRS матрицу для текущей" << endl;
+    cout << "4. Транспонировать текущую матрицу" << endl;
+    cout << "5. Умножить текущую матрицу на вектор" << endl;
+    cout << "6. Умножить текущую матрицу на другую" << endl;
+
+    cout << "Ваш выбор: ";
+
+    cin >> choice;
+    try{
+      switch (choice) {
+        case 1: {
+          cout << "\nВведите текущую матрицу" << endl;
+          matrixA = inputM();
+          break;
+        }
+        case 2: {
+          cout << "\nТекущая матрица:" << endl;
+          cout << matrixA;
+          break;
+        }
+        case 3: {
+          printCRSInternals(matrixA, "A");
+          break;
+        }
+        case 4: {
+          matrixA = matrixA.transpose();
+          cout << "\nРезультат транспонирования" << endl;
+          cout << matrixA;
+          break;
+        }
+        case 5: {
+          vector<int> vec(matrixA.getCols());
+          
+          cout << "Введите " << vec.size() << " элементов вектора:" << endl;
+          for (size_t i = 0; i < vec.size(); i++) {
+              cin >> vec[i];
+          }
+          
+          vector<int> res = matrixA * vec;
+          
+          cout << "Результат: ";
+          for (size_t i = 0; i < res.size(); i++) {
+              cout << res[i] << " ";
+          }
+          cout << endl;
+          break;
+        }
+        
+        case 6: { 
+          size_t r, c;
+          cout << "Введите количество строк и столбцов второй матрицы: ";
+          cin >> r >> c;
+          
+          vector<vector<int>> dense(r, vector<int>(c, 0));
+          cout << "Введите элементы матрицы: " << endl;
+
+          for (size_t i = 0; i < r; i++) {
+              for (size_t j = 0; j < c; j++) {
+                  cin >> dense[i][j];
+              }
+          }
+          
+          matrixB = TCRSMatrix<int>(dense);
+          
+          TCRSMatrix<int> res = matrixA * matrixB;
+          
+          cout << "\nРезультат умножения матриц :" << endl;
+          cout << res;
+          break;
+        }
+        default: {
+          cout << "Нет такого пункта в меню" << endl;
+          break;
+      }
     }
   }
-
-  // Конвертируем в формат CRS
-  TCRSMatrix<int> a(dense_a);
-  TCRSMatrix<int> b(dense_b);
-
-  cout << "Matrix a = " << endl << a << endl;
-  printCRSInternals(a, "a");
-
-  cout << "Matrix b = " << endl << b << endl;
-
-  // 1. Тестирование транспонирования
-  TCRSMatrix<int> a_t = a.transpose();
-  cout << "Matrix a^T (транспонированная a) = " << endl << a_t << endl;
-  printCRSInternals(a_t, "a^T");
-
-  // 2. Тестирование умножения матрицы на вектор (SpMV)
-  vector<int> res_vec = a * v;
-  cout << "Vector v = [ ";
-  for (int x : v) cout << x << " ";
-  cout << "]" << endl;
-
-  cout << "Result a * v = [ ";
-  for (int x : res_vec) cout << x << " ";
-  cout << "]" << endl << endl;
-
-  // 3. Тестирование умножения матриц (SpGEMM)
-  TCRSMatrix<int> c = a * b;
-  cout << "Matrix c = a * b" << endl << c << endl;
-  printCRSInternals(c, "c");
-
+  catch (const exception& err) {
+      cout << "\nОШИБКА: " << err.what() << endl;
+      break;
+  }
+}
   return 0;
 }
 //---------------------------------------------------------------------------
+
