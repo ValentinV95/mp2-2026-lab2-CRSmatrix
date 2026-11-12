@@ -88,6 +88,9 @@ public:
       if (r_ptr.size() != r + 1)
           throw invalid_argument("Row pointer vector must be rows+1 size");
 
+      if ((r_ptr[0] != 0) || (r_ptr[r] != vals.size()))
+		  throw invalid_argument("Row pointer vector must start with 0 and end with values size");
+
       rows = r;
       cols = c;
       values = vals;
