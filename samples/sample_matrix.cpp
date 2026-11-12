@@ -79,6 +79,43 @@ int main()
   cout << "Matrix c = a * b" << endl << c << endl;
   printCRSInternals(c, "c");
 
+  // 4. Ввод собственных матриц (формат: число строк, число столбцов, элементы построчно)
+  cout << "=== Ввод собственных матриц ===" << endl;
+  cout << "Введите матрицу x (строки, столбцы, элементы построчно): " << endl;
+  TCRSMatrix<int> x(1), y(1);
+  if (cin >> x)
+  {
+    cout << "Matrix x = " << endl << x << endl;
+    printCRSInternals(x, "x");
+    cout << "Matrix x^T = " << endl << x.transpose() << endl;
+
+    cout << "Введите вектор из " << x.getCols() << " элементов: ";
+    vector<int> w(x.getCols());
+    for (auto& e : w) cin >> e;
+    if (cin)
+    {
+      vector<int> xw = x * w;
+      cout << "Result x * w = [ ";
+      for (int e : xw) cout << e << " ";
+      cout << "]" << endl << endl;
+    }
+
+    cin.clear();
+    cout << "Введите матрицу y (строки, столбцы, элементы построчно): " << endl;
+    if (cin >> y)
+    {
+      try
+      {
+        TCRSMatrix<int> z = x * y;
+        cout << "Matrix z = x * y" << endl << z << endl;
+        printCRSInternals(z, "z");
+      }
+      catch (const exception& e)
+        {
+          cout << "Невозможно перемножить матрицы: " << e.what() << endl;
+        }
+    }
+  }
   return 0;
 }
 //---------------------------------------------------------------------------
