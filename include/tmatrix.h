@@ -54,6 +54,8 @@ public:
     TCRSMatrix(const vector<vector<T>>& dense)
     {
         size_t row_ind = 0;
+        if (dense.empty())
+            throw invalid_argument("Dense matrix is empty");
         cols = dense.at(0).size();
         rows = dense.size();
         if (rows > MAX_MATRIX_SIZE || cols > MAX_MATRIX_SIZE || rows == 0 || cols == 0) {
@@ -119,7 +121,7 @@ public:
     // Конвертация обратно в плотную матрицу (для проверки корректности операций)
     vector<vector<T>> toDense() const
     {
-        vector<vector<T>> res(rows, vector<T>(cols, T(0)));
+        vector<vector<T>> res(rows, vector<T>(cols, 0));
         for (size_t i = 0; i < rows; i++) {
             for (size_t j = row_ptr[i]; j < row_ptr[i + 1]; j++){
                 res[i][col_index[j]] = values[j];
@@ -136,14 +138,14 @@ public:
       }
       size_t el_in_row = row_ptr[i + 1] - row_ptr[i];
       if (el_in_row == 0) {
-          return 0;
+          return T(0);
       }
       for (size_t t = row_ptr[i]; t < row_ptr[i + 1]; t++) {
           if (j == col_index[t]) {
               return values[t];
           }
       }
-      return 0;
+      return T(0);
   }
 
   // Сравнение матриц
@@ -160,7 +162,7 @@ public:
   TCRSMatrix transpose() const
   {
       TCRSMatrix res(cols, rows);
-      res.row_ptr.assign(cols + 1, T(0));
+      res.row_ptr.assign(cols + 1, 0);
       res.values.clear();
       res.col_index.clear();
       vector<vector<size_t>> t_col(cols);
@@ -188,7 +190,7 @@ public:
       if (v.size() != cols)
           throw invalid_argument("Inconsistent dimensions of the matrix and the vector");
 
-      vector<T> res(rows, T(0));
+      vector<T> res(rows, 0);
       for (size_t i = 0; i < rows; i++) {
           T sum = 0;
           for (size_t j = row_ptr[i]; j < row_ptr[i + 1]; j++)
@@ -210,7 +212,7 @@ public:
       res.col_index.reserve(col_index.size());
       res.row_ptr.assign(rows + 1, size_t{ 0 });
       size_t x_back, y_back, x_col;
-      vector<T> row(m.cols, T(0));
+      vector<T> row(m.cols, 0);
 
       for (size_t i = 0; i < rows; i++) {
           x_back = row_ptr[i + 1];
