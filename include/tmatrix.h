@@ -87,6 +87,12 @@ public:
       if (r_ptr.size() != r + 1) {
           throw invalid_argument("Row_ptr must have size rows + 1");
       }
+      if (r_ptr[0] != 0) {
+          throw invalid_argument("Row_ptr[0] must be 0");
+      }
+      if (r_ptr[r] != vals.size()) {
+          throw invalid_argument("Row_ptr[r] must equal vals.size()");
+      }
       rows = r;
       cols = c;
       values = vals;
@@ -225,7 +231,11 @@ public:
   friend istream& operator>>(istream& istr, TCRSMatrix& m)
   {
       size_t r, c;
-      istr >> r >> c;
+      if (!(istr >> r >> c)) {
+          return istr;
+      }
+      if (r == 0 || r > MAX_MATRIX_SIZE || c == 0 || c > MAX_MATRIX_SIZE)
+          throw out_of_range("Matrix dimensions should be between 1 and MAX_MATRIX_SIZE");
       vector<vector<T>> matrix(r, vector<T>(c, T(0)));
       for (size_t i = 0; i < r; i++) {
           for (size_t j = 0; j < c; j++) {
