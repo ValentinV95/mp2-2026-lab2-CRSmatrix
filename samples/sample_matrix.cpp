@@ -78,6 +78,63 @@ int main()
   TCRSMatrix<int> c = a * b;
   cout << "Matrix c = a * b" << endl << c << endl;
   printCRSInternals(c, "c");
+  
+
+  //тестовое приложение для ввода матрицы и работы с ней
+  TCRSMatrix<double> Matrix;
+  cout << "Enter the rows and cols matrix, then values of the matrix" << endl;
+  cin >> Matrix;
+
+  cout << "Choose the action: \n\t1. Transpose matrix; \n\t2. Multiply by the vector; \n\t3. Multyply by the matix" << endl;
+  int action;
+  cin >> action;
+
+  switch (action) 
+  {
+  case 1:
+  {
+	  cout << "\nTransposed matrix: " << endl;
+	  TCRSMatrix<double> transpose = Matrix.transpose();
+	  cout << transpose << endl;
+      break;
+  }
+  case 2: 
+  {
+      cout << "\nEnter the vector" << endl;
+	  vector<double> multiply_vector(Matrix.getCols());
+      for (size_t i = 0; i < multiply_vector.size(); i++) {
+          cin >> multiply_vector[i];
+      }
+
+      vector<double> Res = Matrix * multiply_vector;
+	  cout << "\nResult of multiplication: [";
+
+      for (size_t i = 0; i < Res.size(); i++) {
+          if (i > 0) 
+              cout << ", ";
+          cout << Res[i];
+      }
+	  cout << "]" << endl;
+      break;
+    }
+  case 3: 
+    {
+	  TCRSMatrix<double> Matrix2;
+	  cout << "\nEnter the another matrix" << endl;
+      cout << "Enter the rows and cols matrix, then values of the matrix" << endl;
+      cin >> Matrix2;
+
+	  TCRSMatrix<double> Res = Matrix * Matrix2;
+
+      cout << "\nResult of multiplication: " << endl;
+      cout << Res << endl;
+	  break;
+    }
+  default: 
+  {
+      cout << "\nThis command doesn`t exist" << endl;
+  }
+  }
 
   return 0;
 }
