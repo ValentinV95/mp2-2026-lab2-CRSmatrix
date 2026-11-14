@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include "tmatrix.h"
+#include <limits>
 //---------------------------------------------------------------------------
 
 // Вспомогательная функция для наглядного вывода внутренней структуры CRS
@@ -32,53 +33,97 @@ void printCRSInternals(const TCRSMatrix<T>& m, const string& name)
 
 int main()
 {
-  const size_t N = 5;
-  vector<vector<int>> dense_a(N, vector<int>(N, 0));
-  vector<vector<int>> dense_b(N, vector<int>(N, 0));
-  vector<int> v(N, 1);
-
+  
   setlocale(LC_ALL, "Russian");
-  cout << "Тестирование класса работы с разреженными матрицами (CRS)" << endl << endl;
+ 
+  TCRSMatrix<int> tmp;
+  int command;
 
-  // Заполняем исходные плотные матрицы
-  for (size_t i = 0; i < N; i++)
-  {
-    dense_b[i][i] = (i + 1) * 10; // Матрица B — диагональная
-    for (size_t j = i; j < N; j++)
-    {
-      dense_a[i][j] = i * 10 + j + 1; // Матрица A — верхнетреугольная
-    }
+  while (true) {
+      cout << "\n1. Ввести матрицу в формате CRS\n"
+          << "2. Вывести матрицу\n"
+          << "3. Транспонировать матрицу\n"
+          << "4. Умножить матрицу на вектор\n"
+          << "5. Умножить матрицу на другую матрицу\n"
+          << "0. Выход\n"
+          << "Выберите действие: ";
+
+      if (!(cin >> command))
+          break;
+
+      if (command == 0)
+          break;
+
+      try {
+          switch (command) {
+          case 1: {
+              cout << "Введите rows, cols, NNZ, values, col_index, row_ptr:\n";
+
+              if (!(cin >> tmp))
+                  throw invalid_argument("Ошибка чтения матрицы");
+
+              cout << "Матрица сохранена.\n";
+              break;
+          }
+
+          case 2:
+              cout << tmp;
+              break;
+
+          case 3:
+              tmp = tmp.transpose();
+              cout << "Матрица после транспонирования:\n"
+                  << tmp;
+              break;
+
+          case 4: {
+              vector<int> vec(tmp.getCols());
+
+              cout << "Введите " << vec.size()<< " элементов вектора:\n";
+
+              for (auto& value : vec) {
+                  if (!(cin >> value))
+                      throw invalid_argument("Ошибка чтения вектора");
+              }
+
+              vector<int> exp_res = tmp * vec;
+
+              cout << "Результат: ";
+              for (int value : exp_res)
+                  cout << value << ' ';
+              cout << '\n';
+              break;
+          }
+
+          case 5: {
+              TCRSMatrix<int> tmp2;
+
+              cout << "Введите вторую матрицу: rows, cols, NNZ,\n"<< "затем values, col_index, row_ptr:\n";
+
+              if (!(cin >> tmp2))
+                  throw invalid_argument("Ошибка чтения матрицы");
+
+              TCRSMatrix<int> result = tmp * tmp2;
+              cout << "Результат умножения:\n" << result;
+              break;
+          }
+
+          default:
+              cout << "Нет такого пункта меню.\n";
+          }
+      }
+      catch (const exception& error) {
+          cout << "Ошибка: " << error.what() << '\n';
+
+          if (cin.eof() || cin.bad())
+              break;
+
+          if (cin.fail()) {
+              cin.clear();
+              cin.ignore(numeric_limits<streamsize>::max(), '\n');
+          }
+      }
   }
-
-  // Конвертируем в формат CRS
-  TCRSMatrix<int> a(dense_a);
-  TCRSMatrix<int> b(dense_b);
-
-  cout << "Matrix a = " << endl << a << endl;
-  printCRSInternals(a, "a");
-
-  cout << "Matrix b = " << endl << b << endl;
-
-  // 1. Тестирование транспонирования
-  TCRSMatrix<int> a_t = a.transpose();
-  cout << "Matrix a^T (транспонированная a) = " << endl << a_t << endl;
-  printCRSInternals(a_t, "a^T");
-
-  // 2. Тестирование умножения матрицы на вектор (SpMV)
-  vector<int> res_vec = a * v;
-  cout << "Vector v = [ ";
-  for (int x : v) cout << x << " ";
-  cout << "]" << endl;
-
-  cout << "Result a * v = [ ";
-  for (int x : res_vec) cout << x << " ";
-  cout << "]" << endl << endl;
-
-  // 3. Тестирование умножения матриц (SpGEMM)
-  TCRSMatrix<int> c = a * b;
-  cout << "Matrix c = a * b" << endl << c << endl;
-  printCRSInternals(c, "c");
-
   return 0;
 }
 //---------------------------------------------------------------------------
