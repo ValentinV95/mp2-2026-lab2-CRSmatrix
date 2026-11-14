@@ -116,6 +116,13 @@ public:
               throw out_of_range("Column index is out of range");
       }
 
+      for (size_t i = 0; i < r; i++) {
+          for (size_t k = r_ptr[i]; k < r_ptr[i + 1]; k++) {
+              if (k > r_ptr[i] && c_idx[k - 1] >= c_idx[k])
+                  throw invalid_argument(
+                      "Column indices must be strictly increasing within a row");
+          }
+      }
 
       rows = r;
       cols = c;
@@ -161,7 +168,7 @@ public:
   {
 
       if (i >= rows || j >= cols)
-          throw invalid_argument("incorect index in at");
+          throw out_of_range("incorect index in at");
 
       size_t count_tmp_in_row = row_ptr[i + 1] - row_ptr[i];
       if (count_tmp_in_row == 0) return 0;

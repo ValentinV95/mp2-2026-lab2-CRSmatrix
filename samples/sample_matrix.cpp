@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include "tmatrix.h"
+#include <limits>
 //---------------------------------------------------------------------------
 
 // Вспомогательная функция для наглядного вывода внутренней структуры CRS
@@ -113,7 +114,14 @@ int main()
       }
       catch (const exception& error) {
           cout << "Ошибка: " << error.what() << '\n';
-          break;
+
+          if (cin.eof() || cin.bad())
+              break;
+
+          if (cin.fail()) {
+              cin.clear();
+              cin.ignore(numeric_limits<streamsize>::max(), '\n');
+          }
       }
   }
   return 0;
